@@ -1,10 +1,4 @@
-# GIS MVP Starter — Runnable Scaffold (ZIP bundle)
-
-This ZIP contains a runnable minimal GIS MVP scaffold:
-- **backend/**: Go (Gin) service with auth, features and sync endpoints.
-- **mobile/**: Expo React Native app (TypeScript) that collects points offline and syncs.
-- **migrations/**: SQL to create PostGIS-enabled schemas.
-- **docker-compose.yml** to run Postgres+PostGIS and the backend.
+## RAMANI setup
 
 ## Quick dev setup (local)
 1. Install Docker & Docker Compose, Node.js & npm, and Expo CLI (`npm install -g expo-cli`).
