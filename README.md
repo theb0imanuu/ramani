@@ -2,15 +2,14 @@
 
 ## Quick dev setup (local)
 1. Install Docker & Docker Compose, Node.js & npm, and Expo CLI (`npm install -g expo-cli`).
-2. Unpack this archive: `unzip gis-mvp-starter.zip && cd gis-mvp-starter`.
-3. Start DB + backend: `docker compose up --build -d`.
-4. Apply migrations inside the db container:
+2. Start DB + backend: `docker compose up --build -d`.
+3. Apply migrations inside the db container:
    ```
    docker exec -i $(docker ps -qf "ancestor=postgis/postgis:15-3.3") psql -U gisuser -d gisdb -f /app/migrations/init.sql
    ```
    Or copy migrations into the container and run `psql`.
-5. Build & run the Go backend (the Dockerfile already builds and runs it). Check `http://localhost:8080/health`.
-6. Start mobile app:
+4. Build & run the Go backend (the Dockerfile already builds and runs it). Check `http://localhost:8080/health`.
+5. Start mobile app:
    ```
    cd mobile
    npm install
