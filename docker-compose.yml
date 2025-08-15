@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:15-3.4-alpine
+    container_name: ramani_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-gisuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gispassword}
+      POSTGRES_DB: ${POSTGRES_DB:-gisdb}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    container_name: ramani_backend
+    depends_on:
+      - db
+    env_file:
+      - ./backend/.env # Use the .env file inside the backend folder
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - ./backend/uploads:/app/uploads # Persist uploaded files
+
+  admin:
+    build:
+      context: ./admin
+      args:
+        # Pass in the backend URL at build time if needed, though proxy is better
+        VITE_API_URL: http://localhost:8080/api
+    container_name: ramani_admin
+    depends_on:
+      - backend
+    ports:
+      - "8081:80" # Expose Nginx on port 8081 on the host
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local

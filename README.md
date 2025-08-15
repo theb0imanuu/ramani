@@ -1,87 +1,49 @@
-## RAMANI setup
+# The Ramani GIS Platform
 
-## Quick dev setup (local)
-1. Install Docker & Docker Compose, Node.js & npm, and Expo CLI (`npm install -g expo-cli`).
-2. Start DB + backend: `docker compose up --build -d`.
-3. Apply migrations inside the db container:
-   ```
-   docker exec -i $(docker ps -qf "ancestor=postgis/postgis:15-3.3") psql -U gisuser -d gisdb -f /app/migrations/init.sql
-   ```
-   Or copy migrations into the container and run `psql`.
-4. Build & run the Go backend (the Dockerfile already builds and runs it). Check `http://localhost:8080/health`.
-5. Start mobile app:
-   ```
-   cd mobile
-   npm install
-   npx expo start
-   ```
-   Use Expo Go on your device or run the emulator. Adjust `mobile/src/config.ts` `API_BASE` to point to backend (for Android emulator use `http://10.0.2.2:8080`, for iOS simulator `http://localhost:8080`, for physical device point to your machine IP).
+**Ramani** is a comprehensive, multi-purpose GIS platform designed for incident reporting and task management in the field. It provides a robust backend, a web-based administrative portal, and a cross-platform mobile application for field agents.
 
-## Production-ready high-level guidance (what to change before production)
-Below are the recommended production hardening steps and design changes. The code in this bundle is intentionally minimal for learning and quick iteration — do **not** deploy it as-is to production.
+## Project Overview
 
-### Backend (Go)
-1. **Passwords & auth**
-   - Replace SHA256 with `bcrypt` for password hashing: `golang.org/x/crypto/bcrypt`.
-   - Implement refresh tokens (rotating refresh tokens), store refresh tokens server-side (Redis or Postgres table), and support token revocation.
-   - Use `github.com/golang-jwt/jwt/v5` (already referenced) and verify signing method and claims.
-2. **Input validation & sanitization**
-   - Validate incoming GeoJSON thoroughly. Use a library or strict JSON schema validation.
-   - Validate sizes of uploaded media, and sanitize free-text fields.
-3. **GeoJSON & geometry**
-   - Implement full GeoJSON parsing (Points, LineStrings, Polygons, Multi*). Use robust parsing and convert to PostGIS geometries with `ST_GeomFromGeoJSON`.
-   - Use parameterized queries and prefer prepared statements.
-4. **Database**
-   - Run Postgres with appropriate resource sizing and backups.
-   - Use connection pooling with sensible limits.
-   - Add indexes on spatial columns (GIST on `geom`) and on frequently queried properties.
-5. **Storage**
-   - Use S3-compatible object storage for media; use presigned uploads from the client to avoid routing large files through the API.
-6. **Security**
-   - Serve backend behind HTTPS (TLS) — terminate TLS at a reverse proxy (NGINX, Traefik, or cloud LB).
-   - Rate-limit endpoints, add IP / token throttling, and logging/monitoring.
-   - Implement CORS strictly and use CSP headers where appropriate.
-7. **Sync & conflicts**
-   - Move from simple last-write-wins to a conflict resolution strategy. Options:
-     - Server-authoritative with manual merge UI.
-     - CRDT-based sync (automerge) for complex collaborative edits.
-   - Keep an audit trail/version history of feature edits.
-8. **Observability**
-   - Add structured logging (zap/logrus), distributed tracing (OpenTelemetry), and metrics (Prometheus).
-   - Add health checks and readiness probes.
+This repository contains the full source code for the Ramani platform, developed as a modern, containerized, full-stack application. The system is designed to be scalable, maintainable, and deployable in a cloud-native environment.
 
-### Mobile (React Native)
-1. **Secure token storage**
-   - Store access tokens in secure storage (Keychain on iOS, EncryptedSharedPreferences on Android) — use `react-native-keychain` or `expo-secure-store`.
-   - Use refresh token flow to renew short-lived access tokens.
-2. **Offline & Sync**
-   - Use a robust local storage (Realm or WatermelonDB) if you expect complex queries / large local datasets.
-   - Implement background sync with `react-native-background-fetch` and handle network changes reliably.
-   - Cache basemap tiles for offline viewing. Consider MapLibre + MBTiles for offline vector tiles.
-3. **Media & uploads**
-   - Upload large media directly to S3 via presigned URLs. Keep metadata in the API.
-4. **Permissions & privacy**
-   - Request location permissions with clear rationale. Respect platform privacy policies.
-5. **Testing & QA**
-   - Add E2E tests (Detox or Appium), unit tests, and CI for mobile builds.
+---
 
-### Infrastructure / Deployment
-1. **Containers & orchestration**
-   - Build multi-stage Docker images and push to a registry.
-   - Use Kubernetes (managed like GKE/EKS/AKS) or a managed App Runner for the backend and a managed Postgres (RDS/Cloud SQL/Azure Database) for production.
-2. **CI/CD**
-   - GitHub Actions or GitLab CI to run linters, unit tests, build images, and deploy to staging/prod.
-3. **Backups & DR**
-   - Automated DB backups, object storage lifecycle, and a disaster recovery plan.
-4. **Scaling**
-   - Use horizontal scaling for stateless backend; scale DB vertically and consider read replicas for heavy read workloads.
-5. **Cost**
-   - Monitor costs for tiles, storage, and CDN. Use caching layers and CDNs for tile serving.
+## Features
 
-## Files included
-- docker-compose.yml
-- migrations/init.sql
-- backend/ (Go source)
-- mobile/ (Expo app)
-- README.md (this file)
+### 1. Backend (Go)
+- **RESTful API**: A complete API for managing users, incidents, tasks, and authentication.
+- **Spatial Data Support**: Leverages PostgreSQL with PostGIS for efficient storage and querying of geospatial data.
+- **Authentication**: Secure user authentication using JSON Web Tokens (JWT).
+- **File Handling**: Supports image uploads for incident reports, serving them via a static endpoint.
+- **Containerized**: Production-ready, multi-stage Dockerfile for a lightweight and secure deployment.
 
+### 2. Admin Portal (React)
+- **Dashboard**: A central hub displaying recent incidents and a map overview.
+- **Interactive Map View**: A full-page map showing the location of all reported incidents.
+- **Task Management**: A full CRUD interface to create, assign, and manage tasks for field agents.
+- **User Management**: An admin-only interface to manage all users of the system.
+- **Modern UI**: Built with React, Vite, and TypeScript, and styled with Tailwind CSS for a clean and responsive user experience.
+- **Containerized**: Served via Nginx in a Docker container for high performance.
+
+### 3. Mobile App (React Native)
+- **Cross-Platform**: Developed with Expo for seamless operation on both iOS and Android devices.
+- **User Authentication**: Secure login for field agents.
+- **Incident Reporting**: An intuitive form to report new incidents, including a description, photo upload (from camera or gallery), and automatic GPS coordinate capture.
+- **Task List**: Displays a list of tasks assigned specifically to the logged-in user.
+- **Profile Management**: A simple profile screen with a logout option.
+
+---
+
+## Technology Stack
+
+- **Backend**: Go (Golang), Gin (Web Framework), GORM (ORM)
+- **Database**: PostgreSQL + PostGIS
+- **Admin Portal**: React, Vite, TypeScript, Tailwind CSS, Axios, React Router
+- **Mobile App**: React Native, Expo, TypeScript, Styled-Components, Axios, React Navigation
+- **Containerization**: Docker & Docker Compose
+
+---
+
+## Getting Started
+
+For detailed instructions on how to set up and run the project locally, please see the [SETUP.md](SETUP.md) file.
