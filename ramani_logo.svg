@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3BC1FF"/>
+      <stop offset="100%" stop-color="#0066CC"/>
+    </linearGradient>
+    <linearGradient id="pipeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4CAF50"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle (platform/map idea) -->
+  <circle cx="256" cy="256" r="240" fill="#0B1E2D"/>
+
+  <!-- Utility grid / infrastructure map -->
+  <g stroke="#1F4A63" stroke-width="2" opacity="0.5">
+    <line x1="80" y1="150" x2="432" y2="150"/>
+    <line x1="80" y1="256" x2="432" y2="256"/>
+    <line x1="80" y1="362" x2="432" y2="362"/>
+    <line x1="150" y1="80" x2="150" y2="432"/>
+    <line x1="256" y1="80" x2="256" y2="432"/>
+    <line x1="362" y1="80" x2="362" y2="432"/>
+  </g>
+
+  <!-- Pipe network -->
+  <g stroke="url(#pipeGrad)" stroke-width="16" fill="none" stroke-linecap="round">
+    <path d="M100 320 H220 V260 H340 V200 H420"/>
+  </g>
+
+  <!-- IoT sensor nodes -->
+  <g fill="#A5D6A7">
+    <circle cx="220" cy="260" r="10"/>
+    <circle cx="340" cy="200" r="10"/>
+  </g>
+
+  <!-- Wireless signal waves -->
+  <g stroke="#81D4FA" stroke-width="3" fill="none">
+    <path d="M220 245 q15 -20 30 0"/>
+    <path d="M220 235 q25 -35 50 0"/>
+    <path d="M340 185 q15 -20 30 0"/>
+    <path d="M340 175 q25 -35 50 0"/>
+  </g>
+
+  <!-- Central water droplet (monitoring flow) -->
+  <path d="M256 150
+           C256 150 190 240 190 290
+           A66 66 0 0 0 322 290
+           C322 240 256 150 256 150 Z"
+        fill="url(#waterGrad)" stroke="#B3E5FC" stroke-width="3"/>
+
+  <!-- Leak detection ripple -->
+  <g stroke="#B3E5FC" stroke-width="2" fill="none" opacity="0.8">
+    <circle cx="256" cy="310" r="20"/>
+    <circle cx="256" cy="310" r="36"/>
+    <circle cx="256" cy="310" r="52"/>
+  </g>
+</svg>
