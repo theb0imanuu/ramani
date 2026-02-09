@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./backend/sim"
+    },
+    {
+      "path": "./backend/api"
+    },
+    {
+      "path": "./frontend/web"
+    },
+    {
+      "path": "./frontend/mobile"
+    },
+    {
+      "path": "./libs/shared"
+    }
+  ]
+}

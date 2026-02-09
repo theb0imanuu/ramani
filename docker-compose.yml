@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # The Geospatial Database
+  db:
+    image: postgis/postgis:15-3.3
+    container_name: ramani_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ramani_user
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: ramani_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  # (Optional) Database GUI Viewer - accessible at localhost:8080
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: ramani_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@ramani.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
